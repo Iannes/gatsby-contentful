@@ -1,19 +1,16 @@
-import React from 'react'
-import './base.css'
-import Container from './container'
-import Navigation from './navigation'
+import * as React from "react";
+import Container from "./container";
+import Navigation from "./navigation";
+// Styles
+import "./base.css";
 
-class Template extends React.Component {
-  render() {
-    const { children } = this.props
+const Template = ({ children }) => {
+  return (
+    <Container>
+      <Navigation />
+      {children}
+    </Container>
+  );
+};
 
-    return (
-      <Container>
-        <Navigation />
-        {children}
-      </Container>
-    )
-  }
-}
-
-export default Template
+export default Template;
