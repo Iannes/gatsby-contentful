@@ -6,18 +6,42 @@ exports.createPages = ({ graphql, actions }) => {
 
   return new Promise((resolve, reject) => {
     const blogPost = path.resolve("./src/templates/blog-post.js");
-    const productTemplate = path.resolve("./src/templates/product.js");
+    const productTemplate = path.resolve("./src/templates/product.jsx");
+    const pageTemplate = path.resolve("./src/templates/pageTemplate.jsx");
 
     resolve(
       graphql(
         `
           {
+            allContentfulPage {
+              nodes {
+                heroDescription
+                heroTitle
+                id
+                slug
+                name
+                topLevel
+                pageGroup
+                heroImage {
+                  file {
+                    url
+                  }
+                }
+              }
+            }
             allContentfulBlogPost {
               edges {
                 node {
                   title
                   slug
                 }
+              }
+            }
+            allContentfulProduct {
+              nodes {
+                slug
+                title
+                id
               }
             }
           }
@@ -27,6 +51,17 @@ exports.createPages = ({ graphql, actions }) => {
           console.log(result.errors);
           reject(result.errors);
         }
+
+        const pages = result.data.allContentfulPage.nodes;
+        pages.forEach((page) => {
+          createPage({
+            path: `/${page.slug}/`,
+            component: pageTemplate,
+            context: {
+              id: page.id,
+            },
+          });
+        });
 
         const posts = result.data.allContentfulBlogPost.edges;
         posts.forEach((post) => {
@@ -39,16 +74,17 @@ exports.createPages = ({ graphql, actions }) => {
           });
         });
 
-        // const products = result.data.allContentfulBlogPost.edges;
-        // products.forEach((post) => {
-        //   createPage({
-        //     path: `/products/${post.node.slug}/`,
-        //     component: productTemplate,
-        //     context: {
-        //       slug: product.node.slug,
-        //     },
-        //   });
-        // });
+        const products = result.data.allContentfulProduct.nodes;
+        products.forEach((product) => {
+          console.log(product);
+          createPage({
+            path: `/products/${product.slug}/`,
+            component: productTemplate,
+            context: {
+              id: product.id,
+            },
+          });
+        });
       })
     );
   });
